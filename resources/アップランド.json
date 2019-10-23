@@ -1,0 +1,434 @@
+{
+  "title-head": "アップランドとは (アップランドとは) [単語記事] - ニコニコ大百科",
+  "keywords": [
+    "アップランド",
+    "バーチャルYouTuber",
+    "リリース",
+    "電脳少女シロ",
+    "バーチャルアイドル",
+    "2018年",
+    "メリーミルク"
+  ],
+  "article": [
+    {
+      "type": "element",
+      "attrs": {
+        "id": "page-menu"
+      },
+      "tag": "ul",
+      "content": [
+        [
+          {
+            "type": "element",
+            "attrs": null,
+            "tag": "li",
+            "content": [
+              "概要"
+            ]
+          },
+          {
+            "type": "element",
+            "attrs": null,
+            "tag": "li",
+            "content": [
+              "主な関連事業"
+            ]
+          },
+          {
+            "type": "element",
+            "attrs": null,
+            "tag": "li",
+            "content": [
+              "関連項目"
+            ]
+          },
+          {
+            "type": "element",
+            "attrs": null,
+            "tag": "li",
+            "content": [
+              "関連リンク"
+            ]
+          },
+          {
+            "type": "element",
+            "attrs": null,
+            "tag": "li",
+            "content": [
+              "掲示板"
+            ]
+          }
+        ]
+      ]
+    },
+    [
+      "株式会社アップランドとは、主にバーチャルYouTuber電脳少女シロの活動で知られるスマートフォンアプリ事業会社（？）である。"
+    ],
+    {
+      "type": "element",
+      "attrs": {
+        "id": "h2-1"
+      },
+      "tag": "h2",
+      "content": [
+        "概要"
+      ]
+    },
+    [
+      [
+        "APPLANDは、21世紀を創造する総合WEBクリエイター集団です。"
+      ],
+      [
+        "APPLANDには、「クオリティーにこだわるスペシャリストが集まる場所」という意味を込めています。"
+      ]
+    ],
+    [
+      "設立は2007年で、現在バーチャルYouTuberを運営する大手としては（また、IT企業としても）かなりのベテランに入る（キズナアイのActiv8が2016年、ミライアカリのDUOが2015年、にじさんじのいちからが2017年設立など）。これまで複数のスマートフォンアプリやニュースサイトなどをリリース・運営しているが、2018年11月現在では公式サイトからバーチャルYouTuber関連事業以外は削除されている。"
+    ],
+    [
+      "2017年6月、社内の「キズナアイっていいよね！」という軽いノリから電脳少女YouTuberシロを立ち上げ。社内技術者のトレーニングも兼ねたものだったらしく、収益化などは一旦置いて「まずはやってみよう」という精神からスタートしたという。ビジネス化についてはその後も慎重な姿勢をとり、チャンネル収益化は翌2018年1月まで待たれることとなる。"
+    ],
+    [
+      "2018年1月4日に「第1回バーチャルYouTuber勉強会」を開催し、主にテック面からVTuber運営のノウハウを共有。1月末にはバーチャルYouTuberプロダクション「.LIVE（どっとライブ）」の名称を公表し、電脳少女シロとばあちゃるが所属。3月に10人のバーチャルYouTuberを同時リリースさせる「ユーザー参加型バーチャルアイドル声優オーディション」を実施。合格メンバー12人がアイドル部として2019年4月27日にデビュー開始した。"
+    ],
+    [
+      "2018年11月に「第2回VTuber声優オーディション」を実施。2019年6月10日、個人勢として活動していたメリーミルクの所属を発表した。"
+    ],
+    {
+      "type": "element",
+      "attrs": null,
+      "tag": "h4",
+      "content": [
+        "声優内定トラブル"
+      ]
+    },
+    [
+      "2018年11月20日早朝、「アップランドにVTuber声優として内定していたが、リリースの予定が遅れ連絡もなくなった」という匿名のツイートが数日前にネットに投稿されていたことが判明し、バイラルメディアなどで拡散され話題となる。"
+    ],
+    [
+      "この件について、アップランドとアップランドが運営する「.LIVE」Twitterに声明文が投稿（①、②）され、実際には連絡が取られており第三者によるツイートに事実と異なる内容があったことを非難しつつ、リリースが遅れたという大筋の内容は認め、声優二人に謝罪する意向を示した。"
+    ],
+    {
+      "type": "element",
+      "attrs": {
+        "id": "h2-2"
+      },
+      "tag": "h2",
+      "content": [
+        "主な関連事業"
+      ]
+    },
+    {
+      "type": "element",
+      "attrs": null,
+      "tag": "h4",
+      "content": [
+        ".LIVE（バーチャルYouTuberプロダクション）"
+      ]
+    },
+    [
+      ".LIVEは電脳少女シロを筆頭とするバーチャルアイドルが所属するバーチャルプロダクション。現在はばあちゃる、アイドル部12人、メリーミルクを含む全15人が在籍している。"
+    ],
+    [
+      {
+        "type": "element",
+        "attrs": {
+          "src": "/img/ext.png",
+          "class": "link-icon",
+          "alt": "exit"
+        },
+        "tag": "img",
+        "content": [
+          null
+        ]
+      }
+    ],
+    {
+      "type": "element",
+      "attrs": null,
+      "tag": "h4",
+      "content": [
+        "VR LIVE（仮想現実空間）"
+      ]
+    },
+    [
+      "VRLIVEはVRコンテンツのライブ配信が可能な新エンタメVRプラットホーム。現在はα版（開発中）であり調整を繰り返す段階のようである。"
+    ],
+    [
+      {
+        "type": "element",
+        "attrs": {
+          "src": "/img/ext.png",
+          "class": "link-icon",
+          "alt": "exit"
+        },
+        "tag": "img",
+        "content": [
+          null
+        ]
+      }
+    ],
+    {
+      "type": "element",
+      "attrs": null,
+      "tag": "h4",
+      "content": [
+        "少女兵器大戦（スマートフォン向けRPG）"
+      ]
+    },
+    [
+      "少女兵器大戦は2015年冬以降にリリース予定のスマホ向けRPG。現在は事前登録受付期間でありきっといつかリリースされると思いたい。"
+    ],
+    [
+      {
+        "type": "element",
+        "attrs": {
+          "src": "/img/ext.png",
+          "class": "link-icon",
+          "alt": "exit"
+        },
+        "tag": "img",
+        "content": [
+          null
+        ]
+      }
+    ],
+    {
+      "type": "element",
+      "attrs": {
+        "id": "h2-3"
+      },
+      "tag": "h2",
+      "content": [
+        "関連項目"
+      ]
+    },
+    {
+      "type": "element",
+      "attrs": null,
+      "tag": "ul",
+      "content": [
+        [
+          {
+            "type": "element",
+            "attrs": null,
+            "tag": "li",
+            "content": [
+              [
+                " 所属",
+                "バーチャルアイドル",
+                {
+                  "type": "element",
+                  "attrs": null,
+                  "tag": "ul",
+                  "content": [
+                    [
+                      {
+                        "type": "element",
+                        "attrs": null,
+                        "tag": "li",
+                        "content": [
+                          "電脳少女シロ"
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "attrs": null,
+                        "tag": "li",
+                        "content": [
+                          [
+                            "アイドル部",
+                            {
+                              "type": "element",
+                              "attrs": null,
+                              "tag": "ul",
+                              "content": [
+                                [
+                                  {
+                                    "type": "element",
+                                    "attrs": null,
+                                    "tag": "li",
+                                    "content": [
+                                      "もこ田めめめ"
+                                    ]
+                                  },
+                                  {
+                                    "type": "element",
+                                    "attrs": null,
+                                    "tag": "li",
+                                    "content": [
+                                      "花京院ちえり"
+                                    ]
+                                  },
+                                  {
+                                    "type": "element",
+                                    "attrs": null,
+                                    "tag": "li",
+                                    "content": [
+                                      "夜桜たま"
+                                    ]
+                                  },
+                                  {
+                                    "type": "element",
+                                    "attrs": null,
+                                    "tag": "li",
+                                    "content": [
+                                      "牛巻りこ"
+                                    ]
+                                  },
+                                  {
+                                    "type": "element",
+                                    "attrs": null,
+                                    "tag": "li",
+                                    "content": [
+                                      "神楽すず"
+                                    ]
+                                  },
+                                  {
+                                    "type": "element",
+                                    "attrs": null,
+                                    "tag": "li",
+                                    "content": [
+                                      "カルロ・ピノ"
+                                    ]
+                                  },
+                                  {
+                                    "type": "element",
+                                    "attrs": null,
+                                    "tag": "li",
+                                    "content": [
+                                      "木曽あずき"
+                                    ]
+                                  },
+                                  {
+                                    "type": "element",
+                                    "attrs": null,
+                                    "tag": "li",
+                                    "content": [
+                                      "北上双葉"
+                                    ]
+                                  },
+                                  {
+                                    "type": "element",
+                                    "attrs": null,
+                                    "tag": "li",
+                                    "content": [
+                                      "猫乃木もち"
+                                    ]
+                                  },
+                                  {
+                                    "type": "element",
+                                    "attrs": null,
+                                    "tag": "li",
+                                    "content": [
+                                      "ヤマト イオリ"
+                                    ]
+                                  },
+                                  {
+                                    "type": "element",
+                                    "attrs": null,
+                                    "tag": "li",
+                                    "content": [
+                                      "金剛いろは"
+                                    ]
+                                  },
+                                  {
+                                    "type": "element",
+                                    "attrs": null,
+                                    "tag": "li",
+                                    "content": [
+                                      "八重沢なとり"
+                                    ]
+                                  }
+                                ]
+                              ]
+                            }
+                          ]
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "attrs": null,
+                        "tag": "li",
+                        "content": [
+                          "メリーミルク"
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "attrs": null,
+                        "tag": "li",
+                        "content": [
+                          "ばあちゃる"
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "attrs": null,
+                        "tag": "li",
+                        "content": [
+                          [
+                            "（",
+                            "ピーマンくん",
+                            "）"
+                          ]
+                        ]
+                      }
+                    ]
+                  ]
+                }
+              ]
+            ]
+          },
+          {
+            "type": "element",
+            "attrs": null,
+            "tag": "li",
+            "content": [
+              "少女兵器大戦"
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "type": "element",
+      "attrs": {
+        "id": "h2-4"
+      },
+      "tag": "h2",
+      "content": [
+        "関連リンク"
+      ]
+    },
+    {
+      "type": "element",
+      "attrs": null,
+      "tag": "ul",
+      "content": [
+        {
+          "type": "element",
+          "attrs": null,
+          "tag": "li",
+          "content": [
+            [
+              "公式サイト",
+              {
+                "type": "element",
+                "attrs": {
+                  "src": "/img/ext.png",
+                  "class": "link-icon",
+                  "alt": "exit"
+                },
+                "tag": "img",
+                "content": [
+                  null
+                ]
+              }
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

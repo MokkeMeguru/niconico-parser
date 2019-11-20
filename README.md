@@ -24,7 +24,8 @@ sh format.sh
 {"title": <記事タイトル>
 "title-head": <記事タイトル（詳細）>
 "keywords": [<記事につけられるキーワード>]
-"article": [<article>]}
+"article": [<article>]
+"related_words": [[<related_words>]]}
 ```
 
 article は次のようになります。
@@ -51,3 +52,11 @@ article は次のようになります。
 ```
 
 どのタグを削除したかは、 [./doc/remove_tags.org](./doc/remove_tags.org) を参照してください。
+
+## related_words について
+related_words は主に関連項目から収集される項目名のリストです。このリストは階層が存在する場合が多く見られるため、やや複雑な構造を取っています。
+
+また、一つの項目名で、 `hoge・bar` という風に2つのものを指している場合があります。この場合については、名前の `foo・huga` との差別化を図るために、 `hoge///bar` と `///` で区切る処理を行っています。
+
+# bug について
+Please notice via Issue or my Twitter (DM or reply)

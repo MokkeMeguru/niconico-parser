@@ -8,7 +8,7 @@
 lein parse-from-web -u https://dic.nicovideo.jp/a/<contents-title>
 ```
 
-<"タイトル">.json を得ることができます。
+`<タイトル>.json` を得ることができます。
 
 また、 json ファイルを整形するためのツールとして、 `format.sh` を作成しました。
 
@@ -37,7 +37,7 @@ article は次のようになります。
   "content" : <article (つまり下の階層)>
 }]
 ```
-2. 文字列の場合
+2. 文字列の場合    
 `<i>` や `<span>` といった装飾タグについては省くようにプログラムしてあります。
 そのため、それらを省いた要素は dict 構造ではなく string になっています。
 

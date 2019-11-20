@@ -41,7 +41,7 @@ article は次のようになります。
 `<i>` や `<span>` といった装飾タグについては省くようにプログラムしてあります。
 そのため、それらを省いた要素は dict 構造ではなく string になっています。
 
-つまり、以下のような構造が得られる。
+つまり、以下のような構造が得られます。
 ```
 ["hogehoge は foo である。"
 "foo は bar とも言われている。"
@@ -50,4 +50,4 @@ article は次のようになります。
 ]
 ```
 
-どのタグを削除したかは、 [./doc/remove_tags.org](./doc/remove_tags.org) を参照。
+どのタグを削除したかは、 [./doc/remove_tags.org](./doc/remove_tags.org) を参照してください。

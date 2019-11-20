@@ -1,8 +1,16 @@
 # niconico-parser
+ニコニコ大百科のHTML を分析するためのツール
 
-FIXME
 
 ## Usage
+### Web ページの URL から
+```
+lein parse-from-web -u https://dic.nicovideo.jp/a/<contents-title>
+```
+
+<"タイトル">.json を得ることができます。
+## 形式
+
 
 ### Run the application locally
 

@@ -27,10 +27,12 @@
                        (s/select (s/child (s/attr :name (partial = "keywords"))))
                        first :attrs :content) #",")
         article (->> raw (s/select (s/child (s/class :article))) first)
+        title (->> raw (s/select (s/child (s/class :article-title-text))) first (s/select (s/child (s/tag :h1))) first :content first)
         ]
     {:title-head title-head
      :keywords keywords
-     :article article}))
+     :article article
+     :title title}))
 
 (defn filter-article-content [article]
   (->> article :content (take-while #(not= (-> % :attrs :class) "adsense-728 a-banner_space-bottom")) ))
@@ -107,18 +109,20 @@
          concat-strs
          ))
     ))
-;; ;; example
 
-;;  (def tmp (read-html-from-url-n "https://dic.nicovideo.jp/a/%E3%82%A2%E3%83%83%E3%83%97%E3%83%A9%E3%83%B3%E3%83%89"))
+;; ;; example for debug
 
-;; ;; (:title-head tmp)
+;; (def tmp (read-html-from-url-n "https://dic.nicovideo.jp/a/%E3%82%A2%E3%83%83%E3%83%97%E3%83%A9%E3%83%B3%E3%83%89"))
+;; (keys tmp)
 
-
-;; (map concat-strs (flatten-string (parse-example-item
-;;                                   (filter-article-content                                    (:article tmp)))))
+;; (:title-head tmp)
 
 
-;; ;; (filter-article-content (:article tmp))
+ ;; (map concat-strs (flatten-string (parse-example-item
+ ;;                                  (filter-article-content                                    (:article tmp)))))
+
+
+;; (filter-article-content (:article tmp))
 
 ;; (def tmp2 (read-html-from-url-n "https://dic.nicovideo.jp/a/%E3%82%B7%E3%83%A3%E3%83%9F%E5%AD%90%E3%81%8C%E6%82%AA%E3%81%84%E3%82%93%E3%81%A0%E3%82%88"))
 

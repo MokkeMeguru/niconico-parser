@@ -8,7 +8,7 @@
 (defn parse-nicodict-web
   ([url]
    (let [refine-data (nw/read-to-parsed url)]
-     (with-open [writer (clojure.java.io/writer (str  (:title refine-data) ".json") :encoding "UTF-8" :append false)]
+     (with-open [writer (clojure.java.io/writer (clojure.string/replace (str  (:title refine-data) ".json") #"\s" "_")  :encoding "UTF-8" :append false)]
        (.write writer (json/write-str refine-data)))))
   ([url fname]
    (with-open [writer (clojure.java.io/writer fname :encoding "UTF-8")]

@@ -30,7 +30,7 @@
    (filter #(str/ends-with? % ".csv"))))
 
 
-(def tmpfl (get-file-lists "/home/meguru/Documents/nico-dict/zips" 8 14))
+(def tmpfl (get-file-lists "/home/meguru/Documents/nico-dict/zips" 9 14))
 (def tmpf (first tmpfl))
 
 (defn read-csv
@@ -38,7 +38,15 @@
   [^java.io.File file]
   (with-open [f (clojure.java.io/reader file)]
     (let [lines (csv/read-csv f)]
-      (doall (map #(-> % str println) (take 5 lines))))))
+      (doall (map #(identity %) (take 5 lines))))))
 
 
-(read-csv tmpf)
+
+
+(def tmparticle (nth (read-csv tmpf) 4))
+(clojure.pprint/pprint tmparticle)
+
+(-> tmparticle
+    second
+    (str/replace #"\\\n" "")
+    clojure.pprint/pprint)

@@ -15,8 +15,10 @@
                   [org.clojure/data.json "0.2.6"]]
    :ring {:handler niconico-parser.handler/app}
    :uberjar-name "server.jar"
+   :jvm-opts ["-Xmx8G"]
    :plugins [[cider/cider-nrepl "0.23.0-SNAPSHOT"]
              [refactor-nrepl "2.5.0-SNAPSHOT"]]
-   :aliases {"parse-from-web" ["run" "-m" "niconico-parser.web.cli"]}
+   :aliases {"parse-from-web" ["run" "-m" "niconico-parser.web.cli"]
+             "preprocess-corpus" ["run" "-m" "niconico-parser.corpus.core"]}
    :profiles {:dev {:dependencies [[javax.servlet/javax.servlet-api "3.1.0"]]
                    :plugins [[lein-ring "0.12.5"]]}})

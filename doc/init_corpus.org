@@ -45,7 +45,7 @@
   次の sh を ~zips~ フォルダ で実行してください。
   
   #+begin_src sh
-   find . -type f -name "*.csv" -print0 | xargs -0 sed -i -e  's/\([^\\]\)\\"/\1""/g'
+  find . -type f -name "*.txt" -print0 | xargs -0 sed -i -e  's/\([^\\]\|^\)\\"/\1""/g'
   #+end_src
 ** 前処理を施す理由
    https://www.tools.ietf.org/html/rfc4180#section-2 にあるように、二重引用符（”)は文中で用いられる際には重ねて書かれることが一般的です。

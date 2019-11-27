@@ -1,7 +1,15 @@
 # niconico-parser
 ニコニコ大百科のHTML を分析するためのツール
 
-
+## Requirements
+- Memory 8GB~   
+CSVデータを読み込む
+- shell  
+ファイル操作。Linux が Reccomend
+- leiningen  
+このプログラムの言語処理系
+- sqlite3  
+DB 管理
 ## Usage
 ### Niconico大百科データセットから
 まずzipファイルを解凍し、整形します。

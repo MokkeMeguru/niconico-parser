@@ -41,7 +41,11 @@
         └── rev2014.zip
 #+end_example
 * すべての記事ファイルについて前処理を施す
-  次の sh を各 ~rev20*~ フォルダ について実行してください。
+  次の sh を ~zips~ フォルダ で実行してください。
+  
+  #+begin_src sh
+   find . -type f -name "*.csv" -print0 | xargs -0 sed -i -e  's/\([^\\]\)\\"/\1""/g'
+  #+end_src
 ** 前処理を施す理由
    https://www.tools.ietf.org/html/rfc4180#section-2 にあるように、二重引用符（”)は文中で用いられる際には重ねて書かれることが一般的です。
    しかし、このデータセットでは二重引用符をエスケープしています。つまり

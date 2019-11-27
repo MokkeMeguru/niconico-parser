@@ -105,7 +105,8 @@
    #(preprocess-csv
      %
      (fn [lines]
-       (println "start reading ...")
+       ;; TODO: add if statement
+       (println "start reading ..." lines)
        (-> lines
            parse-csv
            (save-serialized-data (str (subs (str %) 0 (- (count (str %)) 4)) "-raw.npy"))

@@ -5,7 +5,7 @@
 ## Usage
 ### Niconico大百科データセットから
 まずzipファイルを解凍し、整形します。
-この手順については [doc/init-corpus.org](./doc/init-corpus.org) を参照してください。
+この手順については [doc/init_corpus.org](./doc/init_corpus.org) を参照してください。
 
 ### Web ページの URL から
 ```

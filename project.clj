@@ -6,7 +6,13 @@
                   [clj-http "3.10.0"]
                   [enlive "1.1.6"]
                   [hickory "0.7.1"]
-                  [org.clojure/tools.cli "0.4.2"]]
+                  [org.clojure/tools.cli "0.4.2"]
+
+                  [org.clojure/data.csv "0.1.4"]
+                  [com.taoensso/nippy "2.14.0"]
+                  [org.clojure/java.jdbc "0.7.9"]
+                  [org.xerial/sqlite-jdbc "3.28.0"]
+                  [org.clojure/data.json "0.2.6"]]
    :ring {:handler niconico-parser.handler/app}
    :uberjar-name "server.jar"
    :plugins [[cider/cider-nrepl "0.23.0-SNAPSHOT"]

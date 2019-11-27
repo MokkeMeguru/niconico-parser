@@ -1,0 +1,32 @@
+# 前準備
+Niconico大百科データセットについて、次のように解凍してください。
+#+begin_example
+.
+└── nico-dict
+    └── zips
+        ├── download.txt
+        ├── head
+        │   ├── head2008.csv
+        │   ├── ...
+        │   └── head2014.csv
+        ├── head.zip
+        ├── res
+        │   ├── res2008.csv
+        │   ├── ...
+        │   └── res2014.csv
+        ├── res.zip
+        ├── rev2008.zip
+        ├── rev2009
+        │   ├── rev200901.csv
+        │   ├── rev200902.csv
+        │   ├── rev200903.csv
+        │   ├── ...
+        │   └── rev200912.csv
+        ├── rev2009.zip
+        ├──...
+        ├── rev2013.zip
+        ├── rev2014
+        │   ├── rev201401.csv
+        │   └── rev201402.csv
+        └── rev2014.zip
+#+end_example

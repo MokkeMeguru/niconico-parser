@@ -1,16 +1,25 @@
 (ns niconico-parser.corpus.core
-  (:require [clojure.string :refer [trim blank? split] :as str]
-            [hickory.select :as s]
-            [clojure.java.jdbc :as sql]
-            [clojure.data.csv :as csv]
-            [clojure.data.json :as json]
-            [niconico-parser.utils :refer :all]
-            [clojure.zip :as zip]
-            [taoensso.nippy :as nippy]
-            [clojure.tools.cli :refer [parse-opts]])
+  (:require
+   [clojure.string :refer [trim blank? split] :as str]
+   [hickory.select :as s]
+   [clojure.java.jdbc :as sql]
+   [clojure.data.csv :as csv]
+   [clojure.data.json :as json]
+   [niconico-parser.utils :refer :all]
+   [clojure.zip :as zip]
+   [taoensso.nippy :as nippy]
+   [clojure.java.io :as io]
+   [clojure.tools.cli :refer [parse-opts]]
+   [cheshire.core :as ches]
+   [niconico-parser.corpus.remove-tag :as rtag]
+   [niconico-parser.corpus.boundary :as bd])
   (:use [hickory.core]
         [hickory.render])
   (:gen-class))
+
+;; ------ settings --------------------------------------------
+(def start-year 8)
+(def end-year 14)
 
 ;; ------ for niconico dict (corpus) --------------------
 
@@ -31,7 +40,7 @@
    (range start (inc end))
    (mapcat (fn [year]
              (get-file-lists-per-year (str zips-folder "/" (format "rev20%02d" year)))))
-   (filter #(str/ends-with? % ".csv"))))
+   (filter #(and (not (str/ends-with? % "jsoned.csv")) (str/ends-with? % ".csv")))))
 
 (defn html->hickory
   "html to hickory data
@@ -70,104 +79,102 @@
       parse
       as-hickory))
 
-(defn parse-csv
-  "parse csv for niconico daihyakka's article
-  csv format is
-  <integer> <string> <integer>
-  article-id article updated-date
-  "
-  [raw-csv]
-  (pmap (fn [[idx raw-html timestamp]]
-          [(Long. (re-find #"[0-9]*" idx)) (html->hickory raw-html) (Long. (re-find #"[0-9]*" timestamp))])
-        raw-csv))
+(defn get-body-from-hick [hick]
+  (s/select
+   (s/child
+    (s/tag :body))
+   hick))
 
-(defn preprocess-csv
-  "read csv"
-  [^java.io.File file fun]
-  (with-open [f (clojure.java.io/reader file)]
-    (let [lines (csv/read-csv f)]
-      (fun lines))))
+(defn remove-empty-content
+  ([hick]
+   (remove-empty-content hick #{}))
+  ([hick remove-tags]
+   (cond
+     (map? hick)
+     (if (->> hick :tag (contains? remove-tags))
+       (-> hick :content (remove-empty-content  remove-tags))
+       (when-not (-> hick :content count zero?)
+         (let [content  (->  hick :content (remove-empty-content remove-tags))]
+           (when-not (-> content count zero?)
+             (assoc hick :content content)))))
+     (vector? hick)
+     (->>
+      (mapv #(-> % (remove-empty-content remove-tags)) hick)
+      (remove nil?)
+      flatten
+      vec)
+     (string? hick)
+     hick
+     :default
+     nil)))
 
-(defn save-serialized-data
-  "serialize as nippy"
-  [data write-file]
-  (nippy/freeze-to-file
-   write-file
-   data))
+(defn get-links
+  [extracted-hick]
+  (remove-empty-content
+   (s/select
+    (s/child
+     (s/tag :a))
+    extracted-hick)
+   (disj rtag/remove-tags :a)))
 
-(defn print-log [_] (println "readed a csv ..."))
-(defn preprocess-all
-  "preprocess all csv file
-  first 
-"
-  [files]
-  (map
-   #(preprocess-csv
-     %
-     (fn [lines]
-       ;; TODO: add if statement
-       (println "start reading ..." lines)
-       (-> lines
-           parse-csv
-           (save-serialized-data (str (subs (str %) 0 (- (count (str %)) 4)) "-raw.npy"))
-           print-log)))
-   files))
+(defn parse-a-line [line db-spec]
+  (let [[idx raw-html timestamp] line
+        extracted-hick (-> raw-html html->hickory get-body-from-hick first)]
+    (concat
+     [idx
+      (ches/generate-string (remove-empty-content  extracted-hick rtag/remove-tags))
+       timestamp
+      (ches/generate-string (get-links extracted-hick))]
+     (vals (bd/get-article-info db-spec idx)))))
 
-(def cli-options
-  [["-s" "--source SOURCE" "Source Directory"
-    :default "/home/meguru/Documents/nico-dict/zips"
-    :parse-fn str]
-   ["-n" "--npy-path NPY-PATH" "NPY PATH"
-    :default "./resources/rev201402-raw.npy"
-    :parse-fn str]
-   ["-h" "--help"]])
+(defn parse-a-file [source db-spec]
+  (let
+      [from (io/as-file source)
+       to (io/as-file (clojure.string/replace source #"\.csv$" "-jsoned.csv"))
+       ]
+    (if (.exists to)
+      (println "[Info] process was finished")
+      (do
+        (println "[Info] process start: " (str from) " to "  (str to))
+        (try
+          (with-open
+            [reader (io/reader from)
+             writer (io/writer to)]
+            (->>
+             (csv/read-csv reader)
+             (map #(parse-a-line % db-spec))
+             (csv/write-csv writer)
+             ))
+            (catch Exception e (println "[ERROR] CSV READ ERROR at " source " exception " e)))
+        (println "[Info]process finish: " (str to) )))))
 
-(defn -main
-  [& args]
-  (let [argdic (parse-opts args cli-options)
-        zips-folder (-> argdic :options :source)
-        argument (-> argdic :arguments first)]
-    (case argument
-      "preprocess-raw-data"
-      (doall (preprocess-all (get-file-lists zips-folder 8 14)))
-      :default (println "see. README"))))
+(defn process-whole
+  [root-path]
+  (let [db-path (str root-path "/head/headers.db")
+        db-spec (bd/gen-db-spec db-path)
+        file-lists (map str (get-file-lists root-path start-year end-year))]
+    (cond
+      (not (.isDirectory (io/file root-path)))
+      (println "folder is not exists. please check the file structure: " root-path)
+      (not (.exists (io/as-file db-path)))
+      (println "db-file is not exists. please check the file structure: " db-path)
+      :default
+      (doall (pmap #(parse-a-file % db-spec) file-lists))
+      )))
 
-;; (defn main []
-;;   (let [dir "/home/meguru/Documents/nico-dict/zips"
-;;         files (get-file-lists dir 14 14)]
-;;     (preprocess-all files)))
+;; ------------ example for debug -----------------------------------------
+;; (let
+;;     [source "/home/meguru/Documents/nico-dict/zips/rev2010/rev201012-b.csv"
+;;      db-path "/home/meguru/Documents/nico-dict/zips/head/headers.db"
+;;      db-spec (bd/gen-db-spec db-path)]
+;;   (parse-a-file source db-spec))
 
-;; (main)
+;; ;; (clojure.string/replace "/home/meguru/Documents/nico-dict/zips/rev2008/rev2008.csv" #"\.csv$"
+;; ;;                         "-jsoned.csv")
+;; (with-open
+;;   [file (io/reader (io/resource "sandbox/rev2008.csv"))]
+;;   (apply +  (map #(count % ) (csv/read-csv file))))
 
-
-
-;; 8 - 14
-;; (def tmpfl (get-file-lists "/home/meguru/Documents/nico-dict/zips" 10 10))
-;; (count tmpfl)
-;; (def tmpf (nth tmpfl 1))
-;; (str tmpf)
-
-
-;; (preprocess-csv tmpf
-;;                 (fn [lines] (-> lines
-;;                                 parse-csv
-;;                                 (save-serialized-data (str (subs (str tmpf) 0 (- (count (str tmpf)) 4)) ".npy"))
-;;                                 #(println "read a csv..." (str tmpf)))))
-
-;; (str (subs (str tmpf) 0 (- (count (str tmpf)) 4)) ".npy")
-;; (first (nippy/thaw-from-file (str (subs (str tmpf) 0 (- (count (str tmpf)) 4)) ".npy")))
-;; (def tmparticle (nth (read-csv tmpf) 1))
-;; (clojure.pprint/pprint tmparticle)
-
-;; (-> tmparticle
-;;     second
-;;     (str/replace #"\\\n" "")
-;;     (str/replace #"\u00A0" " ")
-;;     (str/replace #"&nbsp;" " ")
-;;     (str/replace #"(?<!(src|href))=\"(.*?)\""  "=\"\"")
-;;     (str/replace #"[a-zA-Z]+=\"\"" "")
-;;     (str/replace #"[\s|　]+" " ")
-;;     (str/replace #"<br[^<>]*>" "")
-;;     parse
-;;     as-hickory
-;;     clojure.pprint/pprint)
+;; (with-open
+;;   [file (io/reader "/home/meguru/Documents/nico-dict/zips/rev2010/rev201012-b.csv")]
+;;   (doall (map #(println (count %)) (csv/read-csv file))))

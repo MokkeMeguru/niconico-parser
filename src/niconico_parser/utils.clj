@@ -1,17 +1,17 @@
 (ns niconico-parser.utils
-  (:require [clojure.string :refer [trim blank? split replace]]
-            [clj-http.client :as client]
-            [hickory.select :as s])
+  (:require
+   [clojure.string :as str]
+   [clj-http.client :as client]
+   [hickory.select :as s])
   (:use [hickory.core]
         [hickory.render]))
-
 
 ;; ------ default utility ------------------
 (defn thick-trim [s]
   (-> s
-      (replace "\u00A0" " ")
-      (replace "\u3000" " ")
-      trim))
+      (str/replace "\u00A0" " ")
+      (str/replace "\u3000" " ")
+      str/trim))
 
 (defn trim-by-content
 "trim string elements
@@ -26,7 +26,7 @@
                            (string? e) (thick-trim e)
                            (map? e) (trim-by-content e)
                            :default e)))
-                  (filter (fn [e] (or  (not (string? e)) (not (blank? e)))))
+                  (filter (fn [e] (or  (not (string? e)) (not (str/blank? e)))))
                   vec)))))
 
 (defn read-html-from-url [url]

@@ -10,7 +10,6 @@
   IDR の Niconico大百科データセット について利用申請をし、ダウンロードしてください。
 * 解凍して配置する
   任意のディレクトリ下について、次のように解凍して配置してください。
-  
 #+begin_example
 .
 └── nico-dict
@@ -42,10 +41,9 @@
         └── rev2014.zip
 #+end_example
 * すべての記事ファイルについて前処理を施す
-  次の sh を ~zips~ フォルダ で実行してください。
-  
+  Sehll ファイル [[../resources/preprocess.sh]] を ~zips~ へ配置して、実行して下さい。実行には15分位かかります。
   #+begin_src sh
-  find . -type f -name "*.txt" -print0 | xargs -0 sed -i -e  's/\([^\\]\|^\)\\"/\1""/g'
+    sh preprocess.sh
   #+end_src
 ** 前処理を施す理由
    https://www.tools.ietf.org/html/rfc4180#section-2 にあるように、二重引用符（”)は文中で用いられる際には重ねて書かれることが一般的です。
@@ -71,21 +69,18 @@
    #+begin_example
    [<記事ID>, <記事本文>, <記事更新日時>]
    #+end_example
-   
-   記事更新日時は YYYYMMDDhhmmss と推測される。
-
+     記事更新日時は YYYYMMDDhhmmss と推測されます。
 
 * 記事ヘッダについてデータベースを構築する
   SQLファイル [[../resources/create-table.sql]] Shell ファイル [[../resources/import-dir.sh][../resources/import-dir.sh]]  を ~zips/head/~ へ配置して、実行してください。
-  
   #+begin_src sh
   sh import-dir.sh
   #+end_src
 
-  すると、headers.db というSQLが作成されると思います。このテーブルに記事ヘッダの情報が SQLite に保存されます。
-  
+  すると、headers.db というSQLが作成されると思います。このテーブルに記事ヘッダの情報が SQLite に保存されます。(ちなみに前章の前処理を施していないと，ここで事故を起こします。)
+
   データの例を見てみると、次のようになります。
-  
+
   #+begin_example
   sqlite3 headers.db
   sqlite3 > select * from article_header limit 10
@@ -102,3 +97,14 @@
    47|ハイポーション作ってみた。|\N|v|20090102150209
   #+end_example
   
+* データベースと組み合わせる + 前処理を施す
+  次のコマンドで実行できます。 Leiningen の実行環境が必要です。どうしても Leiningen やなんだ、って方が居たら Jar 版を配布するかもしれません。 Issue で急かして下さい。
+  #+begin_src shell
+lein preprocess-corpus -r /home/meguru/Documents/nico-dict/zips
+#+end_src
+** 前処理で行なっていること
+   前処理で行なっていることは大きく分けて3つあります。
+   1. HTML -> JSON 化    
+      解析を容易にするために HTML を JSON にパースしています。タグとアトリビュート、コンテンツを分離することが出来るため、必要な情報のアクセスが容易になります。
+   2. HTMLの一部のタグの削除     
+      同様の理由でHTML タグの一部を削除しています。削除するタグは [[./remove-tags.org]] にあります。

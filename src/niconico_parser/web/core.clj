@@ -129,10 +129,9 @@
              parse-example-item
              flatten-string
              concat-strs
-             )))
-    ))
+             )))))
 
-;; ;; example for debug
+;; ----------------- example for debug ---------------------------------------------
 
 
 ;; (read-to-parsed  "https://dic.nicovideo.jp/a/%E3%82%A2%E3%83%83%E3%83%97%E3%83%A9%E3%83%B3%E3%83%89")

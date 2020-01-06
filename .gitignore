@@ -1,2 +1,3 @@
 *.npy
 /target/
+/resources/test.csv

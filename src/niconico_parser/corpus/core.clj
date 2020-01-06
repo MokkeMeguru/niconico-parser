@@ -91,12 +91,13 @@
   ([hick remove-tags]
    (cond
      (map? hick)
-     (if (->> hick :tag (contains? remove-tags))
-       (-> hick :content (remove-empty-content  remove-tags))
-       (when-not (-> hick :content count zero?)
-         (let [content  (->  hick :content (remove-empty-content remove-tags))]
-           (when-not (-> content count zero?)
-             (assoc hick :content content)))))
+     (when-not (-> hick :type (= :comment))
+      (if (->> hick :tag (contains? remove-tags))
+        (-> hick :content (remove-empty-content  remove-tags))
+        (when-not (-> hick :content count zero?)
+          (let [content  (->  hick :content (remove-empty-content remove-tags))]
+            (when-not (-> content count zero?)
+              (assoc hick :content content))))))
      (vector? hick)
      (->>
       (mapv #(-> % (remove-empty-content remove-tags)) hick)

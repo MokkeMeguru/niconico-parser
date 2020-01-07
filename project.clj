@@ -14,8 +14,8 @@
                   [org.clojure/java.jdbc "0.7.9"]
                   [org.xerial/sqlite-jdbc "3.28.0"]
                   [org.clojure/data.json "0.2.6"]]
-   :ring {:handler niconico-parser.handler/app}
-   :uberjar-name "server.jar"
+   ;; :ring {:handler niconico-parser.handler/app}
+   ;; :uberjar-name "server.jar"
    :jvm-opts ["-Xmx8G"]
    :plugins [[cider/cider-nrepl "0.23.0-SNAPSHOT"]
              [refactor-nrepl "2.5.0-SNAPSHOT"]]

@@ -31,9 +31,19 @@
 ;; (map #(if (every? string? %) (str/join %) %))
 
 (defn get-related-item-header-list [article]
-  (->> article (s/select (s/child (s/tag :h2)))
-       (filter #(clojure.string/includes? % "関連項目"))
-       (map #(-> % :attrs :id))))
+  (->> article
+       (s/select
+        (s/child
+         (s/tag :h2)))
+       (filter
+        (fn [block]
+          (->
+           (filter (fn [word] (clojure.string/includes? word "関連項目")) (:content block))
+           count zero? not)))
+       (map #(-> % :attrs :id))
+       ;;(filter #(clojure.string/includes? % "関連項目"))
+       ;;(map #(-> % :attrs :id))
+  ))
 
 (defn get-related-item-list [article header-id]
   (->> article (s/select-locs (s/attr :id (partial = header-id))) first second :r
@@ -42,8 +52,8 @@
 
 
 
- (def example_data ["label1" " / " "label2" "_label2" ["hoge" "bar"] "...hoge" "bar"])
- (interpret-related-items example_data)
+ ;; (def example_data ["label1" " / " "label2" "_label2" ["hoge" "bar"] "...hoge" "bar"])
+ ;; (interpret-related-items example_data)
 
 
 

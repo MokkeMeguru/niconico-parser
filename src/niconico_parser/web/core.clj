@@ -5,9 +5,11 @@
             [clojure.data.json :as json]
             [niconico-parser.utils :refer :all]
             [clojure.string :as str]
-            [niconico-parser.web.related :as related])
+            [niconico-parser.web.related :as related]
+            [niconico-parser.web.remove-tag :as rtag])
   (:use [hickory.core]
-        [hickory.render]))
+        [hickory.render])
+  (:gen-class))
 
 ;; ------ for niconico dict (web) --------------------
 
@@ -37,200 +39,237 @@
      :article article
      :title title}))
 
+
 (defn filter-article-content [article]
-  (->> article :content (take-while #(not= (-> % :attrs :class) "adsense-728 a-banner_space-bottom")) ))
+  (->> article :content
+       (take-while  #(-> % :attrs :class (not=  "adsense-728 a-banner_space-bottom")))))
 
+(defn remove-empty-content
+  ([hick]
+   (remove-empty-content hick #{}))
+  ([hick remove-tags]
+   (cond
+     (map? hick)
+     (when-not (-> hick :type (= :comment))
+       (if (->> hick :tag (contains? remove-tags))
+         (-> hick :content (remove-empty-content  remove-tags))
+         (when-not (-> hick :content count zero?)
+           (let [content  (->  hick :content (remove-empty-content remove-tags))]
+             (when-not (-> content count zero?)
+               (assoc hick :content content))))))
+     (vector? hick)
+     (->>
+      (mapv #(-> % (remove-empty-content remove-tags)) hick)
+      (remove nil?)
+      flatten
+      vec)
+     (string? hick)
+     hick
+     :default
+     nil)))
 
-;; TODO: Please Edit this function!
-;; ref: https://github.com/MokkeMeguru/htmlparser/blob/master/doc/adv-doc.org
-(defn parse-example-item [item]
-  (mapv (fn [element]
-          (if (string? element) element
-              (condp = (:tag element)
-                :span (parse-example-item (:content element))
-
-                :em (parse-example-item (:content element))
-                :a (parse-example-item (:content element))
-                :strong (parse-example-item (:content element))
-                :sub (parse-example-item (:content element))
-                :b (parse-example-item (:content element))
-                :nobr (parse-example-item (:content element))
-                :i (parse-example-item (:content element))
-                :hr (parse-example-item (:content element))
-                :br (parse-example-item (:content element))
-
-                :p (parse-example-item (:content element))
-
-                :div (parse-example-item (:content element))
-                :blockquote (parse-example-item (:content element))
-                (if (-> element :content count zero?)
-                  element
-                  (assoc element :content (parse-example-item (:content element)))))))
-        item))
-
-
-(defn flatten-string [parsed-item]
-  (let [parsed-item  (doall parsed-item)]
+(defn concat-strs [sodl]
+  (let [merge-strs
+        (fn [sl]
+          (loop [in sl
+                 out []]
+            (if (-> in count zero?) (-> out reverse vec)
+                (if (-> in first string?)
+                  (recur
+                   (drop-while string? in)
+                   (cons (clojure.string/join "" (take-while string? in)) out))
+                  (recur
+                   (rest in)
+                   (cons (-> in first  concat-strs) out))))))]
     (cond
-      (map? parsed-item)
-      (assoc parsed-item :content [(flatten-string (:content parsed-item))])
-      (or (vector? parsed-item) (list? parsed-item))
-      (let [filtered-parsed-item (filter #(-> % count zero? not) parsed-item)]
-        (if (= 1 (count  filtered-parsed-item))
-          (flatten-string (first filtered-parsed-item))
-          (into [] (concat (map
-                     #(flatten-string %) filtered-parsed-item))))
-        )
-      :default parsed-item)))
+      (map? sodl) (update sodl :content concat-strs)
+      (vector? sodl) (vec (merge-strs sodl))
+      :default
+      sodl)))
 
-(defn concat-strs [str-or-dict-lst]
-  (loop [res []
-         sodl str-or-dict-lst]
-    (if (or (string? sodl) (zero? (count sodl))) res
-        (cond
-          (-> sodl  map?)  sodl
-          (-> sodl first string?)
-          ;; TODO: remove flatten
-          (recur (conj  res (apply str  (filter string? (flatten (take-while #(not (map? %)) sodl)))))
-                 (drop-while #(not (map? %)) sodl))
-          (-> sodl #(or (-> % first vector?) (-> % first list?))) (mapv concat-strs sodl)
-          :default  (recur (conj res (first sodl))
-                           (rest sodl))))))
+(defn rec-dissoc-attrs [article]
+  (let [rec-content (fn [art]
+                      (if (:content art)
+                        (update art :content rec-dissoc-attrs)
+                        art))]
+    (cond
+      (map? article)
+      (-> article
+          (dissoc :attrs)
+          (dissoc :type)
+          rec-content)
+      (vector? article)
+      (mapv rec-dissoc-attrs article)
+      :default
+      article)))
 
-(defn append-related_words [article]
-  (mapv
-   (fn [header]
-     (-> (related/get-related-item-list article header)
-         first
-         filter-article-content
-         parse-example-item
-         flatten-string
-         concat-strs
-         (as-> $
-             (map
-              #(-> % :content
-                   flatten
-                   related/interpret-related-items) $))
-         (as-> $
-             (map #(if (every? string? %) [(str/join %)] %) $))))
-   (related/get-related-item-header-list article)))
+(defn custom-take-while
+  [func item]
+  (loop [acc []
+         _item item]
+    (println acc)
+    (if (and  (func (first _item)) (-> _item count zero? not))
+      (recur (conj acc (first _item)) (rest _item))
+      acc)))
+
+(defn append-related-words [article]
+  (let [key-ids (related/get-related-item-header-list article)]
+    (mapv
+     (fn [key-id]
+       (->> article
+            :content
+            (take-while #(-> % :attrs :class (not= "adsense-728 a-banner_space-bottom")))
+            (map #(remove-empty-content % #{:div}))
+            flatten
+            (filter #(-> % nil? not))
+            (drop-while #(-> % :attrs :id (not= key-id)))
+            rest
+            (filter #(-> % nil? not))
+            (take-while
+             #(-> % :tag name (clojure.string/starts-with? "h") not))
+            (map #(-> %
+                      (remove-empty-content rtag/remove-tags)
+                      concat-strs))
+            (map #(-> %
+                      (remove-empty-content #{:td :li})))
+            (map rec-dissoc-attrs)
+            (filter #(-> % nil? not))
+            ))
+     key-ids)))
 
 (defn read-to-parsed [url]
   (let [raw (read-html-from-url-n url)]
     (-> raw
         (assoc
          :related_words
-         (append-related_words (:article raw)))
+         (append-related-words (:article raw)))
         (assoc
          :article
-         (-> raw
+         (->> raw
              :article
              filter-article-content
-             parse-example-item
-             flatten-string
-             concat-strs
-             )))))
+             (map #(->
+                    %
+                    (remove-empty-content rtag/remove-tags)
+                    concat-strs))
+             (filter #(-> % nil? not)))))))
 
-;; ----------------- example for debug ---------------------------------------------
+;; ----------------- Example for debug ---------------------------------------------
+
+;; (clojure.pprint/pprint
+;;  (->> raw2
+;;      :article
+;;      :content
+;;      (take-while #(-> % :attrs :class (not=  "adsense-728 a-banner_space-bottom")))
+;;      (map #(remove-empty-content % #{:div}))
+;;      flatten
+;;      (map #(-> % :attrs))
+;;      ))
 
 
-;; (read-to-parsed  "https://dic.nicovideo.jp/a/%E3%82%A2%E3%83%83%E3%83%97%E3%83%A9%E3%83%B3%E3%83%89")
-;; (-> (get-related-item-list (-> tmp :article) "h2-3" ) first
+;; (clojure.pprint/pprint
+;;  (let [_raw raw2
+;;        article-content
+;;        (-> _raw
+;;            :article
+;;             :content)
+;;        key-ids (related/get-related-item-header-list (:article _raw))]
+;;     (map
+;;      (fn [key-id]
+;;        (->> article-content
+;;             (take-while #(-> % :attrs :class (not=  "adsense-728 a-banner_space-bottom")))
+;;             (map #(remove-empty-content % #{:div}))
+;;             flatten
+;;             (drop-while #(-> % :attrs :id (not= key-id)))
+;;              rest
+;;             (take-while #(-> % :tag str (clojure.string/starts-with? "h") not))
+;;             (map #(-> %
+;;                       (remove-empty-content rtag/remove-tags)
+;;                       concat-strs))
+;;             (map #(-> %
+;;                       (remove-empty-content #{:td :li})))
+;;             (map rec-dissoc-attrs)
+;;             (filter #(-> % nil? not))
+;;             ))
+;;      key-ids)))
+
+;; (def raw2 (read-html-from-url-n "https://dic.nicovideo.jp/a/%E9%88%B4%E5%8E%9F%E3%82%8B%E3%82%8B"))
+;; (def raw (read-html-from-url-n  "https://dic.nicovideo.jp/a/%E6%A1%90%E7%94%9F%E3%82%B3%E3%82%B3"))
+;; (->> raw
+;;     :article
 ;;     filter-article-content
-;;     parse-example-item
-;;     flatten-string
-;;     concat-strs
-;;     second
-;;     clojure.pprint/pprint)
+;;     (map #(->
+;;            %
+;;            (remove-empty-content rtag/remove-tags)
+;;            concat-strs)))
 
 
-;; (def tmp (read-html-from-url-n "https://dic.nicovideo.jp/a/%E3%82%A2%E3%83%83%E3%83%97%E3%83%A9%E3%83%B3%E3%83%89"))
-;; (keys tmp)
+;; (defn append-related_words-v2 [article]
+;;   (mapv
+;;    (fn [header]
+;;      (-> (related/get-related-item-list article header)
+;;          first
+;;          filter-article-content
+;;          parse-example-item
+;;          flatten-string
+;;          concat-strs
+;;          (as-> $
+;;              (map
+;;               #(-> % :content
+;;                    flatten
+;;                    related/interpret-related-items) $))
+;;          (as-> $
+;;              (map #(if (every? string? %) [(str/join %)] %) $))))
+;;    (related/get-related-item-header-list article)))
 
-;; (-> (get-related-item-list (-> tmp :article) (first (get-related-item-header-list (:article tmp))) )
-;;     first
-;;     filter-article-content
-;;     parse-example-item
-;;     flatten-string
-;;     concat-strs
-;;     (as-> $
-;;         (map
-;;          #(-> % :content
-;;               flatten
-;;               related/interpret-related-items) $))
-;;     (as-> $
-;;         (map #(if (every? string? %) [(str/join %)] %) $)))
-;; (get-related-item-header-list (:article tmp))
-;; (:title-head tmp)
-;; (->>  tmp :article (s/select-locs (s/attr :id (partial = "h2-3"))) first second keys)
-;; (get-related-item-list (-> tmp :article) "h2-3")
+;; (append-related_words-v2 (:article raw))
 
+;; (append-related_words (:article raw))
 
+;; (def related
+;;   (let [headers (related/get-related-item-header-list (:article raw2))]
+;;     (mapv
+;;      #(related/get-related-item-list (:article raw) %)
+;;      headers)))
+;; (println related)
 
-;; (map concat-strs (flatten-string (parse-example-item
-;;                                  (filter-article-content                                    (:article tmp)))))
-
-;; (def tmp2 (read-html-from-url-n "https://dic.nicovideo.jp/a/%E3%82%A4%E3%82%AD%E3%83%AA%E9%AF%96%E5%A4%AA%E9%83%8E"))
-;; (get-related-item-header-list (:article tmp2))
-;; (get-related-item-list (-> tmp2 :article) "h2-3" )
-;; (-> (get-related-item-list (-> tmp2 :article) "h2-3" ) first
-;;     filter-article-content
-;;     parse-example-item
-;;     flatten-string
-;;     concat-strs
-;;     (as-> $
-;;         (map
-;;          #(-> % :content
-;;               flatten
-;;               related/interpret-related-items) $))
-;;     (as-> $
-;;         (map #(if (every? string? %) [(str/join %)] %) $)))
-
-;; (filter-article-content (:article tmp))
-
-;; (def tmp2 (read-html-from-url-n "https://dic.nicovideo.jp/a/%E3%82%B7%E3%83%A3%E3%83%9F%E5%AD%90%E3%81%8C%E6%82%AA%E3%81%84%E3%82%93%E3%81%A0%E3%82%88"))
+;; (related/get-related-item-list (:article raw2) (related/get-related-item-header-list (:article raw2)))
 
 
-;; (filter-article-content (:article tmp2))
 
+;; (count
+;;  (map
+;;    #(->>
+;;      raw2
+;;      :article
+;;      ;; filter-article-content
+;;      (s/select-locs
+;;       (s/attr :id (partial = "h2-5"))))
+;;    (related/get-related-item-header-list (:article raw2))))
 
-;; (str/replace "hoge hoge " "\u00A0" " ")
+;; (first (related/get-related-item-header-list (:article raw2)))
+;; (first  (related/get-related-item-header-list (:article raw2)))
+;; (mapv
+;;  (-> parse-example-item
+;;      concat-strs)
+;;  related)
 
+;; (def testt
+;;   (->> (:article raw)
+;;        (s/select
+;;         (s/child
+;;          (s/tag :h2)))
+;;        ))
+;; (filter #(-> % count zero? not) (map #(filter (fn [word] (clojure.string/includes? word "関連項目")) (:content %)) testt))
 
-;; TODO: fix error on #concat-strs
-;; [
-;;  [
-;;   "「",
-;;   "グランド",
-;;   "くそ野郎や穀潰しや",
-;;   "乳上",
-;;   "や",
-;;   "太陽",
-;;   "ゴリラ",
-;;   "が許されて"
-;;   ],
-;;  "イキリ鯖太郎",
-;;  "が許されないんですか」"
-;;  ],
-
-;; grep 関連項目
-;; for article in 関連項目
-;; if article has lists
-;; apply concat map apply concat map li-parser li-list  lists
-
-;; li-parser  li
-;; separate = false in default
-;; li is list of string or else = elem
-;;  if elem == / - ・…
-;;    separete = true
-;;    pass
-;; if elem is string?
-;;    if separate:
-;;        res[-1] = res[-1] + elem
-;;    res.append(elem)
-;; 
-;;  candidate.append elem
-;; else if elem 
-;;(map #(clojure.string/starts-with? "hoge" %) ["h" "-" "・" "…" "..."])
-
-
+;; (->>
+;;  (:article raw)
+;;  (s/select
+;;   (s/child
+;;    (s/tag :h2)))
+;;  (filter
+;;   (fn [block]
+;;     (->
+;;      (filter (fn [word] (clojure.string/includes? word "関連項目")) (:content block))
+;;      count zero? not)))
+;;  (map #(-> % :attrs :id)))

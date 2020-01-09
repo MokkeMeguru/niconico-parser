@@ -40,7 +40,7 @@ sh format.sh
 "title-head": <記事タイトル（詳細）>
 "keywords": [<記事につけられるキーワード>]
 "article": [<article>]
-"related_words": [[<related_words>]]}
+"related_words": [{<related_words>}]}
 ```
 
 article は次のようになります。

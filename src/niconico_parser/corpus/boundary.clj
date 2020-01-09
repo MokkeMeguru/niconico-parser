@@ -2,7 +2,7 @@
   (:require
    [clojure.java.jdbc :as sql]))
 
-(def article-categories {"a" "単語" "v" "動画" "i" "商品" "l" "生放送"})
+(def article-categories {"a" "単語" "v" "動画" "i" "商品" "l" "生放送" "c" "コミュニティ記事"})
 
 (defn gen-db-spec [db-path]
   {:subprotocol "sqlite"

@@ -102,6 +102,8 @@
   #+begin_src shell
 lein preprocess-corpus -r /home/meguru/Documents/nico-dict/zips
 #+end_src
+
+
 ** 前処理で行なっていること
    前処理で行なっていることは大きく分けて3つあります。
    1. HTML -> JSON 化    

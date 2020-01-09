@@ -1,3 +1,4 @@
 *.npy
 /target/
 /resources/test.csv
+/example/venv/
